@@ -249,13 +249,11 @@ public class HTTPServer3 {
                         userPassword = line[1];
                 }
             }
-            database.addUser(userName, userPassword);
+            database.insertUserIntoUserTable(userName, userPassword);
         }
         catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
