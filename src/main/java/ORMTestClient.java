@@ -1,5 +1,3 @@
-package AD2021.ORM;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,6 +38,16 @@ class ORMClient extends Thread {
                 pw.print("QUESTION" + number + "\r\n");
                 //You can use here to print the sending message.
 //                System.out.println(currentThread().getName() +"  "+ number);
+                switch (number) {
+                    case 1:
+                        //simulated user input
+                        String userName = "newUser1";
+                        int userPassWord = "password123".hashCode();
+
+                        pw.println("addUser");
+                        pw.println("userName=" + userName);
+                        pw.println("userPassword=" + userPassWord);
+                }
             }
 
             pw.flush();

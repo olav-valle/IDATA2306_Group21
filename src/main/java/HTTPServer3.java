@@ -1,7 +1,7 @@
 import java.io.*;
-import java.lang.annotation.Retention;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.*;
 
 public class HTTPServer3 {
@@ -10,6 +10,8 @@ public class HTTPServer3 {
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
     static final int PORT = 8081;
+
+    private static LibDatabase database = LibDatabase.getDatabase();
 
     public static void main(String[] args) {
         ServerSocket server = null;
@@ -38,16 +40,12 @@ public class HTTPServer3 {
     private static void runServer(Socket connection) {
         BufferedReader request = null;
         BufferedOutputStream response = null;
-        LibDatabase database = null;
         try {
             // READ CHARACTERS FROM THE CLIENT VIA INPUT STREAM ON THE SOCKET
             request = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             // WE GET character output stream to client (for headers)
             response = new BufferedOutputStream(connection.getOutputStream());
-
-            // Init database
-            database = new LibDatabase();
 
             // Read only the first line of the request, and break it where there is a space
             // character
@@ -134,12 +132,13 @@ public class HTTPServer3 {
                     line = request.readLine();
                     if (line.equals("Host: localhost")){
                         res.println("Requested body is:");
+                        res.println();
                     }
                     else if(!line.trim().isBlank()){ // if line is not blank
                         res.println(line);
-                        res.println();
                         switch (line) {
                             case "Client 1 -  with QUESTION1":
+                                addUser(res,request);
                                 res.println("Insert Completed!");
                                 break;
                             case "Client 2 -  with QUESTION2":
@@ -149,7 +148,7 @@ public class HTTPServer3 {
                                 res.println("Delete Completed!");
                                 break;
                             default:
-                                res.println("invalid question");
+                                //res.println("invalid question");
                                 break;
                         }
                     }
@@ -234,21 +233,30 @@ public class HTTPServer3 {
     }
 
 
-    /**
-     * Validates if a username is valid.
-     *
-     * @param username username to validate
-     * @return "valid" if valid, or "invalid" if invalid
-     */
-    private static String validUserName(String username){
-        String res = "true";
-        if (username.length() < 8
-                || username.length() > 30
-                || !username.matches("[a-zA-Z0-9_]+")
-                || !username.matches("^[a-zA-Z].*$"))
-        {
-            return "invalid";
+    private static void addUser(PrintWriter res, BufferedReader req){
+        String userName = "";
+        String userPassword = "";
+        try {
+            while (req.ready()) {
+
+                String line[] = req.readLine().split("=");
+
+                switch (line[0]) {
+                    case "userName":
+                        userName = line[1];
+                        break;
+                    case "userPassword":
+                        userPassword = line[1];
+                }
+            }
+            database.addUser(userName, userPassword);
         }
-        return "valid";
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
