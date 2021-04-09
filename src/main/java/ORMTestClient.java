@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 class ORMClient extends Thread {
     static int ASSIGNMENT_NUM = 1;
     Socket s = new Socket(InetAddress.getByName("localhost"), 8081);
+    //Socket s = new Socket(InetAddress.getByName("158.38.101.105"), 80);
     PrintWriter pw = new PrintWriter(s.getOutputStream());
 
     String response;
@@ -47,6 +48,24 @@ class ORMClient extends Thread {
                         pw.println("addUser");
                         pw.println("userName=" + userName);
                         pw.println("userPassword=" + userPassWord);
+                        break;
+                    case 2:
+                        //todo: implement
+                        break;
+                    case 3:
+                        //todo: implement
+                        break;
+                    case 4:
+                        //todo: implement
+                        break;
+                    case 5:
+                        //todo: implement
+                        break;
+                    case 6:
+                        //todo: implement
+                        break;
+                    default:
+                        System.out.println("Not a valid: " + number);
                 }
             }
 
