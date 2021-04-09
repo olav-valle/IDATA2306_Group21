@@ -1,3 +1,5 @@
+package HTTPServer.Services;
+
 import java.sql.*;
 
 public class LibDatabase {
@@ -11,20 +13,26 @@ public class LibDatabase {
         LibDatabase test = new LibDatabase();
         try {
             // clear all tables.
-            con.createStatement().execute("DROP TABLE books");
+            con.createStatement().execute("DROP TABLE IF EXISTS books;");
             con.createStatement().execute("DROP TABLE IF EXISTS user;");
             con.createStatement().execute("DROP TABLE IF EXISTS library_branches;");
             con.createStatement().execute("DROP TABLE IF EXISTS book_loans;");
             con.createStatement().execute("DROP TABLE IF EXISTS branch_inventory;");
 
+            test.createBooksTable();
+            test.createBorrowTable();
+            test.createLibraryBranchesTable();
+            test.createUserTable();
+
+            //task I
+            System.out.println("Task 1");
+            test.insertBookIntoBookTable("How to Horse", "Mr. Horse");
+
             //add filler data to tables
             for (int i = 1; i < 11; i++){
-                test.createBooksTable();
                 test.insertBookIntoBookTable("book" + i, "publisher" + i);
 
-                test.createUserTable();
                 test.insertUserIntoUserTable("UserName" + i, "password123");
-
             }
 
             test.createLibraryBranchesTable();
@@ -38,8 +46,17 @@ public class LibDatabase {
             test.insertBorrowIntoBorrowTable("2","2","1", "01.01.2000");
             test.insertBorrowIntoBorrowTable("3","3","2", "01.01.2000");
             test.insertBorrowIntoBorrowTable("2","4","2", "01.01.2000");
+            test.insertBorrowIntoBorrowTable("2","4","1", "01.01.2000");
+            test.insertBorrowIntoBorrowTable("2","3","2", "01.01.2000");
+            test.insertBorrowIntoBorrowTable("1","2","2", "01.01.2000");
+            //Changed last borrow from branch 1 to branch 2,
+            // since branch 1 book 2 is loaned by borrower 2 (second line).
             System.out.println("test add books");
 
+            //Task III
+            System.out.println("Task 3");
+
+            test.removeBorrowByIds("1", "1", "1");
 
             //print all books.
             System.out.println("\nPrint Books in table");
@@ -51,14 +68,10 @@ public class LibDatabase {
                 System.out.println(); //make some space
             }
 
-            System.out.println("\n\nUsers:");
-            res = test.getAllUsers();
-            while (res.next()){
-                System.out.println("User_Id: " + res.getString(1));
-                System.out.println("User Name: " + res.getString(2));
-                System.out.println("User Password: " + res.getString(3));
-                System.out.println();
-            }
+            //task II
+            System.out.println("Task 2");
+
+            test.updateUser("1", "newUserName", "newStrongerPassword456!");
 
             System.out.println("\n\nUsers:");
             res = test.getAllUsers();
@@ -69,22 +82,37 @@ public class LibDatabase {
                 System.out.println();
             }
 
-            res = test.getAllBorrows();
-            while (res.next()){
-                System.out.println("DueDate: " + res.getString("due_date"));
-                System.out.println("DueDate: " + res.getString(1));
-                System.out.println("DueDate: " + res.getString(2));
-                System.out.println("DueDate: " + res.getString(3));
-            }
+            //Task IV
+            System.out.println("Task 4");
 
             res = test.findBorrowedBooksByTitle("book1");
             while (res.next()){
                 System.out.println("title: " + res.getString("title"));
+                System.out.println("Name of borrower: " + res.getString("name"));
+                System.out.println("Branch id: " + res.getString("branch_id"));
+                //todo: get branch name? Collides with borrower name in res object..?
             }
+
+            System.out.println(); // make some space
+            // task V
+            System.out.println("Task 5");
 
             res = test.findBorrowedBooksByDueDateFromBranchName("Branch A","01.01.2000");
             while (res.next()){
-                System.out.println(res.getString("name"));
+                System.out.println();
+                System.out.println("Branch: " + res.getString("branch"));
+                System.out.println("Name: " + res.getString("name"));
+            }
+
+            // task VI
+
+            System.out.println(); // make some space
+            System.out.println("Task 6");
+
+            res = test.getNumberOfBorrowsPerBranch();
+            while (res.next()){
+                System.out.print(res.getString("name") + ": ");
+                System.out.println(res.getString("books_amount"));
             }
 
 
@@ -98,6 +126,14 @@ public class LibDatabase {
 
     private LibDatabase(){
         getConnection();
+        try {
+            createBooksTable();
+            createBorrowTable();
+            createLibraryBranchesTable();
+            createUserTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -173,8 +209,12 @@ public class LibDatabase {
                 "password= ?" +
                 "Where id = ?");
 
-        statement.setString(1, userName);
-        statement.setString(2, password);
+        if (userName != null){
+            statement.setString(1, userName);
+        }
+        if (password != null){
+            statement.setString(2, password);
+        }
         statement.setString(3, id);
         statement.executeUpdate();
     }
@@ -245,6 +285,19 @@ public class LibDatabase {
         prep.execute();
     }
 
+    public synchronized boolean insertBook(String title, String publisher) {
+        boolean success = false;
+        if ( !title.trim().isBlank() && !publisher.trim().isBlank()){
+            try {
+                insertBookIntoBookTable(title, publisher);
+                success = true;
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        return  success;
+    }
+
     //todo: Java doc
     private synchronized ResultSet getAllBooksFromBooksTable() throws SQLException {
 
@@ -265,7 +318,7 @@ public class LibDatabase {
     }
 
     //todo: java Doc, Guards
-    private synchronized void insertLibraryBranchIntoLibraryBranchTable(String name, String address) throws SQLException {
+    public synchronized void insertLibraryBranchIntoLibraryBranchTable(String name, String address) throws SQLException {
 
         PreparedStatement prep = con.prepareStatement("INSERT INTO library_branches values(?,?,?);");
         prep.setString(2,name);
@@ -291,7 +344,7 @@ public class LibDatabase {
     }
 
 
-    private synchronized void insertBorrowIntoBorrowTable(
+    public synchronized void insertBorrowIntoBorrowTable(
             String borrowerId, String bookId, String branchId, String due_date) throws SQLException {
 
         //check for duplicate entry before trying to insert
@@ -305,7 +358,22 @@ public class LibDatabase {
         }
     }
 
-    private synchronized String[] findBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
+    public synchronized void removeBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
+
+        if (findBorrowByIds(borrowerId, bookId, branchId) == null){
+            PreparedStatement prep = con.prepareStatement("DELETE FROM book_loans " +
+                    "WHERE borrowers_id = ? " +
+                    "AND book_id = ? " +
+                    "AND branch_id = ?;");
+
+            prep.setString(1,borrowerId);
+            prep.setString(2,bookId);
+            prep.setString(3,branchId);
+            prep.executeUpdate();
+        }
+    }
+
+    public synchronized String[] findBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
         String[] res = null;
         PreparedStatement prep = con.prepareStatement("SELECT * FROM book_loans " +
                 "WHERE borrowers_id = ?" +
@@ -336,6 +404,22 @@ public class LibDatabase {
         return res;
     }
 
+
+    public synchronized ResultSet getNumberOfBorrowsPerBranch() throws SQLException {
+        if (con == null){ getConnection(); }
+
+        Statement state = con.createStatement();
+        ResultSet res = state.executeQuery("SELECT " +
+                "COUNT(bl.book_id) AS books_amount, lb.name AS name " +
+                "FROM book_loans bl " +
+                "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +
+                "GROUP BY bl.branch_id;");
+
+        return res;
+    }
+
+
+
     /**
      *
      * @param title
@@ -356,7 +440,7 @@ public class LibDatabase {
 
 
     public synchronized ResultSet findBorrowedBooksByDueDateFromBranchName(String branch, String dueDate) throws SQLException {
-        PreparedStatement sqlQuery = con.prepareStatement("SELECT * FROM book_loans bl " +
+        PreparedStatement sqlQuery = con.prepareStatement("SELECT lb.name AS branch, u.name AS name FROM book_loans bl " +
                 "JOIN (SELECT * FROM user u) AS u ON u.id = bl.borrowers_id " +
                 "JOIN (SELECT * FROM books b) AS b ON b.book_id = bl.book_id " +
                 "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +

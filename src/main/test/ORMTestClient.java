@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,7 +9,8 @@ import java.net.UnknownHostException;
 
 class ORMClient extends Thread {
     static int ASSIGNMENT_NUM = 1;
-    Socket s = new Socket(InetAddress.getByName("localhost"), 8081);
+    Socket s = new Socket(InetAddress.getByName("localhost"), 8080);
+    //Socket s = new Socket(InetAddress.getByName("158.38.101.105"), 80);
     PrintWriter pw = new PrintWriter(s.getOutputStream());
 
     String response;
@@ -40,13 +42,32 @@ class ORMClient extends Thread {
 //                System.out.println(currentThread().getName() +"  "+ number);
                 switch (number) {
                     case 1:
-                        //simulated user input
-                        String userName = "newUser1";
-                        int userPassWord = "password123".hashCode();
 
-                        pw.println("addUser");
-                        pw.println("userName=" + userName);
-                        pw.println("userPassword=" + userPassWord);
+                        String title = "title";
+                        String publisher = "publisher";
+//                        String publisher = "pub'); DROP TABLE books;--";
+
+                        pw.print("insertBook" + "\r\n");
+                        pw.print("title=" + title + "\r\n");
+                        pw.print("publisher=" + publisher + "\r\n");
+                        break;
+                    case 2:
+                        //todo: implement
+                        break;
+                    case 3:
+                        //todo: implement
+                        break;
+                    case 4:
+                        //todo: implement
+                        break;
+                    case 5:
+                        //todo: implement
+                        break;
+                    case 6:
+                        //todo: implement
+                        break;
+                    default:
+                        System.out.println("Not a valid: " + number);
                 }
             }
 
