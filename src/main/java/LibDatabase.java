@@ -116,6 +116,14 @@ public class LibDatabase {
 
     private LibDatabase(){
         getConnection();
+        try {
+            createBooksTable();
+            createBorrowTable();
+            createLibraryBranchesTable();
+            createUserTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
