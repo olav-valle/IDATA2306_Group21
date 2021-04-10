@@ -10,52 +10,17 @@ public class LibDatabase {
 
     // Only for testing!
     public static void main(String[] args) {
-        LibDatabase test = new LibDatabase();
         try {
             // clear all tables.
-            con.createStatement().execute("DROP TABLE IF EXISTS books;");
-            con.createStatement().execute("DROP TABLE IF EXISTS user;");
-            con.createStatement().execute("DROP TABLE IF EXISTS library_branches;");
-            con.createStatement().execute("DROP TABLE IF EXISTS book_loans;");
-            con.createStatement().execute("DROP TABLE IF EXISTS branch_inventory;");
 
-            test.createBooksTable();
-            test.createBorrowTable();
-            test.createLibraryBranchesTable();
-            test.createUserTable();
+            LibDatabase test = new LibDatabase();
+            test.fillDatabaseWithTestData(true);
 
-            //task I
-            System.out.println("Task 1");
-            test.insertBookIntoBookTable("How to Horse", "Mr. Horse");
-
-            //add filler data to tables
-            for (int i = 1; i < 11; i++){
-                test.insertBookIntoBookTable("book" + i, "publisher" + i);
-
-                test.insertUserIntoUserTable("UserName" + i, "password123");
-            }
-
-            test.createLibraryBranchesTable();
-            test.insertLibraryBranchIntoLibraryBranchTable("Branch A", "Street A");
-            test.insertLibraryBranchIntoLibraryBranchTable("Branch B", "Street B");
-
-
-            // user , book , branch , due date.
-            test.createBorrowTable();
-            test.insertBorrowIntoBorrowTable("1","1","1", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("2","2","1", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("3","3","2", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("2","4","2", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("2","4","1", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("2","3","2", "01.01.2000");
-            test.insertBorrowIntoBorrowTable("1","2","2", "01.01.2000");
             //Changed last borrow from branch 1 to branch 2,
             // since branch 1 book 2 is loaned by borrower 2 (second line).
-            System.out.println("test add books");
 
             //Task III
             System.out.println("Task 3");
-
             test.removeBorrowByIds("1", "1", "1");
 
             //print all books.
@@ -123,18 +88,91 @@ public class LibDatabase {
         }
     }
 
+    /**
+     * Fills the Database with some dummy data.
+     * If the param is set to true. all data will be cleared from the database.
+     *
+     * @param dropAllTables if true, clear the DB of all data
+     * @throws SQLException
+     */
+    public synchronized void fillDatabaseWithTestData(boolean dropAllTables) throws SQLException {
+        if (dropAllTables){
+            dropAllTables();
+        }
+        fillDatabaseWithTestData();
+    }
+
+    /**
+     * Fills the Database with some dummy data.
+     *
+     * @throws SQLException
+     */
+    public synchronized void fillDatabaseWithTestData() throws SQLException {
+        fillBooksTableWithTestData();
+        fillUsersWithTestData();
+        fillLibraryBranchesTableWithTestData();
+        fillBorrowTableWithTestData();
+    }
+
+    private synchronized void fillUsersWithTestData() throws SQLException {
+        for (int i = 1; i < 11; i++){
+            insertUserIntoUserTable("UserName" + i, "password123");
+        }
+    }
+
+    private synchronized void fillBorrowTableWithTestData() throws SQLException {
+        createBorrowTable();
+        insertBorrowIntoBorrowTable("1","1","1", "01.01.2000");
+        insertBorrowIntoBorrowTable("2","2","1", "01.01.2000");
+        insertBorrowIntoBorrowTable("3","3","2", "01.01.2000");
+        insertBorrowIntoBorrowTable("2","4","2", "01.01.2000");
+        insertBorrowIntoBorrowTable("2","4","1", "01.01.2000");
+        insertBorrowIntoBorrowTable("2","3","2", "01.01.2000");
+        insertBorrowIntoBorrowTable("1","2","2", "01.01.2000");
+    }
+
+    private synchronized void fillLibraryBranchesTableWithTestData() throws SQLException {
+        createLibraryBranchesTable();
+        insertLibraryBranchIntoLibraryBranchTable("Branch A", "Street A");
+        insertLibraryBranchIntoLibraryBranchTable("Branch B", "Street B");
+    }
+
+    private synchronized void fillBooksTableWithTestData() throws SQLException {
+        //task I
+        //add filler data to tables
+        System.out.println("test add books");
+        System.out.println("Task 1");
+        insertBookIntoBookTable("How to Horse", "Mr. Horse");
+        for (int i = 1; i < 11; i++){
+            insertBookIntoBookTable("book" + i, "publisher" + i);
+        }
+    }
+
+    private synchronized static void dropAllTables() throws SQLException {
+        con.createStatement().execute("DROP TABLE IF EXISTS books;");
+        con.createStatement().execute("DROP TABLE IF EXISTS user;");
+        con.createStatement().execute("DROP TABLE IF EXISTS library_branches;");
+        con.createStatement().execute("DROP TABLE IF EXISTS book_loans;");
+        con.createStatement().execute("DROP TABLE IF EXISTS branch_inventory;");
+        getDatabase().createAllTables();
+    }
+
 
     private LibDatabase(){
         getConnection();
 
         try {
-            createBooksTable();
-            createBorrowTable();
-            createLibraryBranchesTable();
-            createUserTable();
+            createAllTables();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createAllTables() throws SQLException {
+        createBooksTable();
+        createBorrowTable();
+        createLibraryBranchesTable();
+        createUserTable();
     }
 
     /**
@@ -198,7 +236,7 @@ public class LibDatabase {
      *
      * @throws SQLException
      */
-    public ResultSet getAllUsers() throws SQLException {
+    public synchronized ResultSet getAllUsers() throws SQLException {
         if (con == null){ getConnection(); }
 
         Statement state = con.createStatement();
@@ -257,7 +295,7 @@ public class LibDatabase {
      * @param password user Password
      * @throws SQLException
      */
-         public boolean insertUserIntoUserTable(String userName, String password) throws SQLException {
+         public synchronized boolean insertUserIntoUserTable(String userName, String password) throws SQLException {
         //guards
         if (userName == null || userName.equals("")) {
             return false;
@@ -407,6 +445,16 @@ public class LibDatabase {
         }
     }
 
+    /**
+     * Removes a instance of a borrowed book
+     * I takes the ID of the user, book and branch to find and remove the correct borrow.
+     *
+     *
+     * @param borrowerId the Id of the user who borrowed the book
+     * @param bookId  The Id of the borrowed book
+     * @param branchId The Id of the branch the book was borrowed from
+     * @throws SQLException
+     */
     public synchronized void removeBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
 
         if (findBorrowByIds(borrowerId, bookId, branchId) == null){
@@ -505,52 +553,12 @@ public class LibDatabase {
                 "JOIN (SELECT * FROM user u) AS u ON u.id = bl.borrowers_id " +
                 "JOIN (SELECT * FROM books b) AS b ON b.book_id = bl.book_id " +
                 "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +
-                "WHERE lb.name = ? ");
+                "WHERE lb.name = ? " +
+                "AND bl.due_date = ?");
         sqlQuery.setString(1, branch);
-        //sqlQuery.setString(2, dueDate);
+        sqlQuery.setString(2, dueDate);
         ResultSet res = sqlQuery.executeQuery();
 
         return res;
     }
-
-
-    /**
-     * Drops all tables and adds filler data for testing.
-     * @throws SQLException
-     */
-    private void initialize() throws SQLException {
-
-
-        if(!hasData) {
-            hasData = true;
-
-            Statement state = con.createStatement();
-            ResultSet res = state.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='user'");
-
-            if (!res.next()){
-                System.out.println("Building the User table");
-
-                //create new user table, PS Do not store username and password in the same DB!!!!!!!!!!1!!1
-                Statement state2 = con.createStatement();
-                state2.execute("CREATE TABLE user (" +
-                        "id INTEGER PRIMARY KEY," +
-                        "name TEXT," +
-                        "password TEXT " +
-                        ");");
-
-                //insert data
-                PreparedStatement prep = con.prepareStatement("INSERT INTO user values(?,?,?);");
-                prep.setString(2, "Jon ");
-                prep.setString(3, "Jensen");
-                prep.execute();
-
-                PreparedStatement prep2 = con.prepareStatement("INSERT INTO user values(?,?,?);");
-                prep2.setString(2, "Bob");
-                prep2.setString(3, "Bakke");
-                prep2.execute();
-            }
-        }
-    }
-
-
 }
