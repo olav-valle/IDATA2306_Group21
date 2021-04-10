@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -375,36 +376,68 @@ public class HTTPHandler implements Runnable {
 
         LibDatabase db = LibDatabase.getDatabase();
         String[] reqBodyLines = request.getBody().split("\n");
+        boolean success = false;
         if (reqBodyLines.length > 1) {
             switch (reqBodyLines[1]) {
                 case ("insertBook"):
                     // Question 1
-                    boolean success = db.insertBook(
+                    success = db.insertBook(
                             reqBodyLines[2].split("=")[1],
                             reqBodyLines[3].split("=")[1]
                     );
-                    response.appendBodyString("Book insertion successful.");
                     if (success) {
+                        response.appendBodyString("Book insertion successful.");
                         System.out.println("Added book");
                     }
                     break;
                 case ("updateUser"):
-                    db.updateUser(reqBodyLines[2].split("=")[1],
+                    // Question 2
+                    success = db.updateUser(reqBodyLines[2].split("=")[1],
                             reqBodyLines[3].split("=")[1],
                             reqBodyLines[4].split("=")[1]);
-                    // Question 2
+                    if (success) {
+                        response.appendBodyString("User details updated..");
+
+                    } else {
+                        response.appendBodyString("Failed to update user details");
+                    }
                     break;
                 case ("removeBorrowByIds"):
                     // Question 3
+                    try {
+                        db.removeBorrowByIds(reqBodyLines[2].split("=")[1],
+                                reqBodyLines[3].split("=")[1],
+                                reqBodyLines[4].split("=")[1]);
+                        response.appendBodyString("");
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                     break;
                 case ("findBorrowedBooksByTitle"):
                     // Question 4
+                    try {
+                        db.findBorrowedBooksByTitle(reqBodyLines[2].split("=")[1]);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                     break;
                 case ("findBorrowedBooksByDueDateFromBranchName"):
                     // Question 5
+                    try {
+                        db.findBorrowedBooksByDueDateFromBranchName(
+                                reqBodyLines[2].split("=")[1],
+                                reqBodyLines[3].split("=")[1]);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                     break;
                 case ("getNumberOfBorrowsPerBranch"):
                     // Question 6
+                    try {
+                        db.getNumberOfBorrowsPerBranch();
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
                     break;
             }
         }
