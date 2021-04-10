@@ -42,7 +42,6 @@ class ORMClient extends Thread {
 //                System.out.println(currentThread().getName() +"  "+ number);
                 switch (number) {
                     case 1:
-
                         String title = "title";
                         String publisher = "publisher";
                         //String publisher = "pub'); DROP TABLE books;--";
@@ -53,7 +52,7 @@ class ORMClient extends Thread {
                         break;
 
                     case 2:
-                        String id = "title";
+                        String id = "1";
                         String newName = "publisher";
                         String newPassword = "newPassword";
 
@@ -63,29 +62,34 @@ class ORMClient extends Thread {
                         pw.print("newPassword=" + newPassword + "\n");
                         break;
                     case 3:
-                        pw.print("updateUser\n");
+                        pw.print("removeBorrowByIds\n");
 
-                        String borrowers_id = "1";
-                        String book_id = "1";
-                        String branch_id = "1";
+                        String borrowersId = "1";
+                        String bookId = "1";
+                        String branchId = "1";
 
-                        pw.print("borrowersId=" + borrowers_id + "\n");
-                        pw.print("bookId=" + book_id + "\n");
-                        pw.print("branchId=" + branch_id + "\n");
+                        pw.print("borrowersId=" + borrowersId + "\n");
+                        pw.print("bookId=" + bookId + "\n");
+                        pw.print("branchId=" + branchId + "\n");
                         break;
                     case 4:
                         pw.print("findBorrowedBooksByTitle\n");
 
-                        String User_Id;
-
-                                pw.print("User_Id="+ "\n");
+                        title = "test"; // title was defined in this scope.
+                        pw.print("title="+ title + "\n");
 
                         break;
                     case 5:
-                        //todo: implement
+                        pw.print("findBorrowedBooksByDueDateFromBranchName\n");
+
+                        String branch = "Branch A";
+                        String dueDate = "01.01.2000";
+
+                        pw.print("branch=" + branch + "\n");
+                        pw.print("dueDate=" + dueDate + "\n");
                         break;
                     case 6:
-                        //todo: implement
+                        pw.print("getNumberOfBorrowsPerBranch");
                         break;
                     default:
                         System.out.println("Not a valid: " + number);
