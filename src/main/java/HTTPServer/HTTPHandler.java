@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -388,6 +389,8 @@ public class HTTPHandler implements Runnable {
                     if (success) {
                         response.appendBodyString("Book insertion successful.");
                         System.out.println("Added book");
+                    } else {
+                        response.appendBodyString("Warning: Book insertion failed.");
                     }
                     break;
                 case ("updateUser"):
@@ -399,7 +402,7 @@ public class HTTPHandler implements Runnable {
                         response.appendBodyString("User details updated..");
 
                     } else {
-                        response.appendBodyString("Failed to update user details");
+                        response.appendBodyString("Warning: Failed to update user details");
                     }
                     break;
                 case ("removeBorrowByIds"):
@@ -408,15 +411,24 @@ public class HTTPHandler implements Runnable {
                         db.removeBorrowByIds(reqBodyLines[2].split("=")[1],
                                 reqBodyLines[3].split("=")[1],
                                 reqBodyLines[4].split("=")[1]);
-                        response.appendBodyString("");
+                        response.appendBodyString("Book loan instance successfully deleted.");
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
+                        response.appendBodyString("Warning: Failed to delete book loan instance.");
                     }
                     break;
                 case ("findBorrowedBooksByTitle"):
                     // Question 4
                     try {
-                        db.findBorrowedBooksByTitle(reqBodyLines[2].split("=")[1]);
+                        ResultSet res = db.findBorrowedBooksByTitle(reqBodyLines[2].split("=")[1]);
+                        response.appendBodyString("Results:\n----\n");
+                        while (res.next()){
+                            response.appendBodyString("Book title: " + res.getString("book_title")+"\n");
+                            response.appendBodyString("Name of borrower: " + res.getString("user_name")+"\n");
+                            response.appendBodyString("Branch Name: " + res.getString("branch_name")+"\n");
+                            response.appendBodyString("\n");
+
+                        }
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
