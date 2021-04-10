@@ -87,9 +87,9 @@ public class LibDatabase {
 
             res = test.findBorrowedBooksByTitle("book1");
             while (res.next()){
-                System.out.println("title: " + res.getString("title"));
-                System.out.println("Name of borrower: " + res.getString("name"));
-                System.out.println("Branch id: " + res.getString("branch_id"));
+                System.out.println("Book title: " + res.getString("book_name"));
+                System.out.println("Name of borrower: " + res.getString("user_name"));
+                System.out.println("Branch Name: " + res.getString("branch_name"));
                 //todo: get branch name? Collides with borrower name in res object..?
             }
 
@@ -97,6 +97,7 @@ public class LibDatabase {
             // task V
             System.out.println("Task 5");
 
+            //todo: replace date with today. do this for all steps.
             res = test.findBorrowedBooksByDueDateFromBranchName("Branch A","01.01.2000");
             while (res.next()){
                 System.out.println();
@@ -439,10 +440,14 @@ public class LibDatabase {
      * @throws SQLException
      */
     public synchronized ResultSet findBorrowedBooksByTitle(String title) throws SQLException {
-        PreparedStatement sqlQuery = con.prepareStatement("SELECT * FROM book_loans bl " +
+        PreparedStatement sqlQuery = con.prepareStatement("SELECT " +
+                "b.title AS book_name, " +
+                "lb.name AS branch_name, " +
+                "u.name AS user_name " +
+                "FROM book_loans bl " +
                 "JOIN (SELECT * FROM user u) AS u ON u.id = bl.borrowers_id " +
                 "JOIN (SELECT * FROM books b) AS b ON b.book_id = bl.book_id " +
-                "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +
+                "JOIN (SELECT * FROM library_branches lb) AS lb ON lb.branch_id = bl.branch_id " +
                 "WHERE b.title = ?;");
         sqlQuery.setString(1, title);
         ResultSet res = sqlQuery.executeQuery();

@@ -9,7 +9,7 @@ import java.net.UnknownHostException;
 
 class ORMClient extends Thread {
     static int ASSIGNMENT_NUM = 1;
-    Socket s = new Socket(InetAddress.getByName("localhost"), 8080);
+    Socket s = new Socket(InetAddress.getByName("localhost"), 8082);
     //Socket s = new Socket(InetAddress.getByName("158.38.101.105"), 80);
     PrintWriter pw = new PrintWriter(s.getOutputStream());
 
@@ -53,13 +53,33 @@ class ORMClient extends Thread {
                         break;
 
                     case 2:
-                        //todo: implement
+                        String id = "title";
+                        String newName = "publisher";
+                        String newPassword = "newPassword";
+
+                        pw.print("updateUser" + "\n");
+                        pw.print("id=" + id + "\n");
+                        pw.print("newName=" + newName + "\n");
+                        pw.print("newPassword=" + newPassword + "\n");
                         break;
                     case 3:
-                        //todo: implement
+                        pw.print("updateUser\n");
+
+                        String borrowers_id = "1";
+                        String book_id = "1";
+                        String branch_id = "1";
+
+                        pw.print("borrowersId=" + borrowers_id + "\n");
+                        pw.print("bookId=" + book_id + "\n");
+                        pw.print("branchId=" + branch_id + "\n");
                         break;
                     case 4:
-                        //todo: implement
+                        pw.print("findBorrowedBooksByTitle\n");
+
+                        String User_Id;
+
+                                pw.print("User_Id="+ "\n");
+
                         break;
                     case 5:
                         //todo: implement
