@@ -126,6 +126,7 @@ public class LibDatabase {
 
     private LibDatabase(){
         getConnection();
+
         try {
             createBooksTable();
             createBorrowTable();
@@ -149,7 +150,9 @@ public class LibDatabase {
         return database;
     }
 
-
+    /**
+     * Start and opens the connection to the Database "SQLiteTest1.db"
+     */
     private void getConnection(){
         //drivers
         try {
@@ -190,10 +193,10 @@ public class LibDatabase {
     }
 
     /**
+     * Get all users from the Database.
+     * @return A ResultSet of all users in rhe DB.
      *
-     * @return
      * @throws SQLException
-     * @throws ClassNotFoundException
      */
     public ResultSet getAllUsers() throws SQLException {
         if (con == null){ getConnection(); }
@@ -203,6 +206,13 @@ public class LibDatabase {
         return res;
     }
 
+    /**
+     * Todo: Java Doc
+     * @param id
+     * @param userName
+     * @param password
+     * @return
+     */
     public synchronized boolean updateUser(String id, String userName, String password){
         boolean success = false;
         try{
@@ -215,6 +225,13 @@ public class LibDatabase {
         return success;
     }
 
+    /**
+     * update the Username and password for a user found by ID
+     *
+     * @param id Id of user to update
+     * @param userName new username that wil username the old password
+     * @param password new password that wil replace the old password
+     */
     private synchronized void updateUserEntry(String id, String userName, String password) throws SQLException {
         PreparedStatement statement = con.prepareStatement("UPDATE user SET " +
                 "name = ?," +
@@ -235,8 +252,6 @@ public class LibDatabase {
      *  create a new User and insert it in the database
      *  The class DB_AddUserBuilder can be used do this.
      *  name and password can not be null or empty string.
-     *
-     *  Ps. No sanitized is preformed here.
      *
      * @param userName User name
      * @param password user Password
@@ -273,6 +288,7 @@ public class LibDatabase {
 
     /**
      * create books table
+     *
      * @throws SQLException
      */
     private synchronized void createBooksTable() throws SQLException {
@@ -285,9 +301,10 @@ public class LibDatabase {
     }
 
     /**
+     * Adds a book in the books table.
      *
-     * @param title
-     * @param publisher
+     * @param title the title of the book
+     * @param publisher the publisher of the book
      * @throws SQLException
      */
     private synchronized void insertBookIntoBookTable(String title, String publisher) throws SQLException {
@@ -297,6 +314,13 @@ public class LibDatabase {
         prep.execute();
     }
 
+    /**
+     * Adds a book in the books table.
+     *
+     * @param title the title of the book.
+     * @param publisher the publisher of the book.
+     * @return true if the book was inserted successfully.
+     */
     public synchronized boolean insertBook(String title, String publisher) {
         boolean success = false;
         if ( !title.trim().isBlank() && !publisher.trim().isBlank()){
@@ -310,7 +334,11 @@ public class LibDatabase {
         return  success;
     }
 
-    //todo: Java doc
+    /**
+     * return all books int the books table
+     * @return ResultSet of all books int the books table
+     * @throws SQLException
+     */
     private synchronized ResultSet getAllBooksFromBooksTable() throws SQLException {
 
         Statement state = con.createStatement();
@@ -319,8 +347,12 @@ public class LibDatabase {
         return res;
     }
 
-    //todo: Java doc
-    private void createLibraryBranchesTable() throws SQLException {
+    /**
+     * Create the library_branches table if it does not exist.
+     *
+     * @throws SQLException
+     */
+    private synchronized void createLibraryBranchesTable() throws SQLException {
         Statement state = con.createStatement();
         state.execute("CREATE TABLE IF NOT EXISTS library_branches (" +
                 "branch_id INTEGER PRIMARY KEY," +
@@ -329,7 +361,12 @@ public class LibDatabase {
                 ");");
     }
 
-    //todo: java Doc, Guards
+    /**
+     * Inserts a new library branch in the library_branches table
+     * @param name
+     * @param address
+     * @throws SQLException
+     */
     public synchronized void insertLibraryBranchIntoLibraryBranchTable(String name, String address) throws SQLException {
 
         PreparedStatement prep = con.prepareStatement("INSERT INTO library_branches values(?,?,?);");
@@ -339,10 +376,10 @@ public class LibDatabase {
     }
 
 
-
-
-
-    //Borrows
+    /**
+     * Create the book_loans table if it does not exist.
+     * @throws SQLException
+     */
     private synchronized void createBorrowTable() throws SQLException {
         Statement state = con.createStatement();
         state.execute("CREATE TABLE IF NOT EXISTS book_loans (" +
@@ -407,7 +444,15 @@ public class LibDatabase {
         return res;
     }
 
+
+    /**
+     * get all the borrowed books
+     *
+     * @return ResultSet of all book loans.
+     * @throws SQLException
+     */
     private synchronized ResultSet getAllBorrows() throws SQLException {
+        //
         if (con == null){ getConnection(); }
 
         Statement state = con.createStatement();

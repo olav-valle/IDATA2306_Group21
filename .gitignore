@@ -2,3 +2,7 @@
 /.idea/
 /src/main/java/LibDatabaseV2.java
 /target/
+/SQLiteTest1.db
+/lib/serverLog0.log
+/lib/serverLog0.log.lck
+/lib/serverLog1.log
