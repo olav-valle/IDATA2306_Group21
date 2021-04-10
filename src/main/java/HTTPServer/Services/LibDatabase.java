@@ -198,7 +198,7 @@ public class LibDatabase {
      *
      * @throws SQLException
      */
-    public ResultSet getAllUsers() throws SQLException {
+    public synchronized ResultSet getAllUsers() throws SQLException {
         if (con == null){ getConnection(); }
 
         Statement state = con.createStatement();
@@ -257,7 +257,7 @@ public class LibDatabase {
      * @param password user Password
      * @throws SQLException
      */
-         public boolean insertUserIntoUserTable(String userName, String password) throws SQLException {
+         public synchronized boolean insertUserIntoUserTable(String userName, String password) throws SQLException {
         //guards
         if (userName == null || userName.equals("")) {
             return false;
@@ -407,6 +407,16 @@ public class LibDatabase {
         }
     }
 
+    /**
+     * Removes a instance of a borrowed book
+     * I takes the ID of the user, book and branch to find and remove the correct borrow.
+     *
+     *
+     * @param borrowerId the Id of the user who borrowed the book
+     * @param bookId  The Id of the borrowed book
+     * @param branchId The Id of the branch the book was borrowed from
+     * @throws SQLException
+     */
     public synchronized void removeBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
 
         if (findBorrowByIds(borrowerId, bookId, branchId) == null){
@@ -512,45 +522,4 @@ public class LibDatabase {
 
         return res;
     }
-
-
-    /**
-     * Drops all tables and adds filler data for testing.
-     * @throws SQLException
-     */
-    private void initialize() throws SQLException {
-
-
-        if(!hasData) {
-            hasData = true;
-
-            Statement state = con.createStatement();
-            ResultSet res = state.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='user'");
-
-            if (!res.next()){
-                System.out.println("Building the User table");
-
-                //create new user table, PS Do not store username and password in the same DB!!!!!!!!!!1!!1
-                Statement state2 = con.createStatement();
-                state2.execute("CREATE TABLE user (" +
-                        "id INTEGER PRIMARY KEY," +
-                        "name TEXT," +
-                        "password TEXT " +
-                        ");");
-
-                //insert data
-                PreparedStatement prep = con.prepareStatement("INSERT INTO user values(?,?,?);");
-                prep.setString(2, "Jon ");
-                prep.setString(3, "Jensen");
-                prep.execute();
-
-                PreparedStatement prep2 = con.prepareStatement("INSERT INTO user values(?,?,?);");
-                prep2.setString(2, "Bob");
-                prep2.setString(3, "Bakke");
-                prep2.execute();
-            }
-        }
-    }
-
-
 }
