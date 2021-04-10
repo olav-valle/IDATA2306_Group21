@@ -42,6 +42,7 @@ class ORMClient extends Thread {
 //                System.out.println(currentThread().getName() +"  "+ number);
                 switch (number) {
                     case 1:
+
                         String title = "title";
                         String publisher = "publisher";
                         //String publisher = "pub'); DROP TABLE books;--";
@@ -52,9 +53,9 @@ class ORMClient extends Thread {
                         break;
 
                     case 2:
-                        String id = "1";
-                        String newName = "publisher";
-                        String newPassword = "newPassword";
+                        String id = "10";
+                        String newName = "superUser";
+                        String newPassword = "s3cr3t";
 
                         pw.print("updateUser" + "\n");
                         pw.print("id=" + id + "\n");
