@@ -129,18 +129,21 @@ public class ORMTestClient {
         ORMClient ormClient3 = new ORMClient();
         ORMClient ormClient4 = new ORMClient();
         ORMClient ormClient5 = new ORMClient();
+        ORMClient ormClient6 = new ORMClient();
 
         ormClient1.setName("Client 1 - ");
         ormClient2.setName("Client 2 - ");
         ormClient3.setName("Client 3 - ");
         ormClient4.setName("Client 4 - ");
         ormClient5.setName("Client 5 - ");
+        ormClient5.setName("Client 6 - ");
 
         ormClient1.start();
         ormClient2.start();
         ormClient3.start();
         ormClient4.start();
         ormClient5.start();
+        ormClient6.start();
 
     }
 }
