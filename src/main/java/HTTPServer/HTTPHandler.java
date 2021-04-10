@@ -474,6 +474,9 @@ public class HTTPHandler implements Runnable {
                         throwables.printStackTrace();
                     }
                     break;
+                default:
+                    status = HttpStatusCode.getByValue(400);
+                    response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
             }
         }
 
