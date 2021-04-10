@@ -53,9 +53,9 @@ class ORMClient extends Thread {
                         break;
 
                     case 2:
-                        String id = "title";
-                        String newName = "publisher";
-                        String newPassword = "newPassword";
+                        String id = "10";
+                        String newName = "superUser";
+                        String newPassword = "s3cr3t";
 
                         pw.print("updateUser" + "\n");
                         pw.print("id=" + id + "\n");
