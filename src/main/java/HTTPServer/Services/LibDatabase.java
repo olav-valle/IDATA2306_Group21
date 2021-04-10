@@ -203,7 +203,19 @@ public class LibDatabase {
         return res;
     }
 
-    public synchronized void updateUser(String id, String userName, String password) throws SQLException {
+    public synchronized boolean updateUser(String id, String userName, String password){
+        boolean success = false;
+        try{
+            updateUserEntry(id, userName, password);
+            success = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return success;
+    }
+
+    private synchronized void updateUserEntry(String id, String userName, String password) throws SQLException {
         PreparedStatement statement = con.prepareStatement("UPDATE user SET " +
                 "name = ?," +
                 "password= ?" +

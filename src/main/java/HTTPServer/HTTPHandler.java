@@ -378,6 +378,7 @@ public class HTTPHandler implements Runnable {
         if (reqBodyLines.length > 1) {
             switch (reqBodyLines[1]) {
                 case ("insertBook"):
+                    // Question 1
                     boolean success = db.insertBook(
                             reqBodyLines[2].split("=")[1],
                             reqBodyLines[3].split("=")[1]
@@ -386,6 +387,25 @@ public class HTTPHandler implements Runnable {
                     if (success) {
                         System.out.println("Added book");
                     }
+                    break;
+                case ("updateUser"):
+                    db.updateUser(reqBodyLines[2].split("=")[1],
+                            reqBodyLines[3].split("=")[1],
+                            reqBodyLines[4].split("=")[1]);
+                    // Question 2
+                    break;
+                case ("removeBorrowByIds"):
+                    // Question 3
+                    break;
+                case ("findBorrowedBooksByTitle"):
+                    // Question 4
+                    break;
+                case ("findBorrowedBooksByDueDateFromBranchName"):
+                    // Question 5
+                    break;
+                case ("getNumberOfBorrowsPerBranch"):
+                    // Question 6
+                    break;
             }
         }
 
