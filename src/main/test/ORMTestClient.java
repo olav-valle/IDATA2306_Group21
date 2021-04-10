@@ -45,12 +45,13 @@ class ORMClient extends Thread {
 
                         String title = "title";
                         String publisher = "publisher";
-//                        String publisher = "pub'); DROP TABLE books;--";
+                        //String publisher = "pub'); DROP TABLE books;--";
 
                         pw.print("insertBook" + "\r\n");
                         pw.print("title=" + title + "\r\n");
                         pw.print("publisher=" + publisher + "\r\n");
                         break;
+
                     case 2:
                         //todo: implement
                         break;
@@ -73,7 +74,7 @@ class ORMClient extends Thread {
 
             pw.flush();
 
-            while ((response = br.readLine()) != null) System.out.println(response);
+            while ((response = br.readLine()) != null) System.out.println(currentThread().getName() + " " + response);
 
 
         }catch(Exception e){

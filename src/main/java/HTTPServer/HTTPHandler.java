@@ -382,6 +382,7 @@ public class HTTPHandler implements Runnable {
                             reqBodyLines[2].split("=")[1],
                             reqBodyLines[3].split("=")[1]
                     );
+                    response.appendBodyString("Book insertion successful.");
                     if (success) {
                         System.out.println("Added book");
                     }
