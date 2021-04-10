@@ -4,8 +4,6 @@ import HTTPServer.HTTPMessage.HTTPRequest;
 import HTTPServer.HTTPMessage.HTTPResponse;
 import HTTPServer.HTTPStatusCode.HttpStatusCode;
 import HTTPServer.Services.LibDatabase;
-import HTTPServer.Services.PokerSend;
-import HTTPServer.Services.ValidUserName;
 
 import java.io.*;
 import java.net.Socket;
@@ -16,11 +14,9 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static HTTPServer.HTTPServer.*;
 
@@ -453,7 +449,8 @@ public class HTTPHandler implements Runnable {
                         while (res.next()) {
                             response.appendBodyString(
                                     "Branch: " + res.getString("branch") + "\n");
-                            response.appendBodyString("Book title: " + res.getString("book_title") + "\n");
+                            response.appendBodyString(
+                                    "Book title: " + res.getString("book_title") + "\n");
                             response.appendBodyString(
                                     "Borrower name: " + res.getString("borrower_name")  + "\n\n");
 

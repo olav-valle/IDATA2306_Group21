@@ -1,17 +1,12 @@
 package HTTPServer;
 
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.*;
 
 public class HTTPServer{
@@ -67,11 +62,11 @@ public class HTTPServer{
 
 
                 logger.info("Connection established on date: " + new Date() + "\n");
-                Thread.sleep(2000);
+//                Thread.sleep(0);
                 //runServer(connectionSocket);
             } while (true);
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.out.println("Server error as: " + e);
         }
 
@@ -103,40 +98,6 @@ public class HTTPServer{
         in.lines().forEach(System.out::println);
     }
 
-    /**
-     * Closes given Socket, BufferedReader and BufferedOutputStream objects.
-     *
-     * @param connection Connected socket.
-     * @param reader     BufferedReader related to socket being closed.
-     * @param outStream  BufferedOutputStream related to socket being closed.
-     */
-    private static void closeConnection(Socket connection, BufferedReader reader, BufferedOutputStream outStream) {
-        try {
-            if (reader != null) reader.close();
-            if (outStream != null) outStream.close();
-            if (connection != null) connection.close();
-        } catch (IOException ioe) {
-            logger.severe("Server socket closed.");
-            logger.info(ioe.getMessage());
-        } finally {
-            fileLogger.close(); // Write tail to logger file
-        }
-    }
-
-    /**
-     * Formats the given Instant according to RFC 1123.
-     * Example: Sun, 06 Nov 1994 08:49:37 GMT.
-     *
-     * @param time The Instant to format.
-     * @return The Instant, formatted according to RFC 1123.
-     */
-    private static String toServerHTTPTime(Instant time) {
-        return DateTimeFormatter // RFC 1123 compliant HTTP time
-                .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-                .withZone(ZoneId.of("GMT"))
-                .format(time);
-
-    }
 
 
 }
