@@ -374,7 +374,7 @@ public class HTTPHandler implements Runnable {
     private static void POSTLibraryAPI(HTTPResponse.Builder response, HTTPRequest request) {
 
         LibDatabase db = LibDatabase.getDatabase();
-        String[] reqBodyLines = request.getBody().split("\r\n");
+        String[] reqBodyLines = request.getBody().split("\n");
         if (reqBodyLines.length > 1) {
             switch (reqBodyLines[1]) {
                 case ("insertBook"):

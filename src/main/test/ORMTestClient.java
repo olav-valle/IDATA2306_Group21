@@ -37,7 +37,7 @@ class ORMClient extends Thread {
 
             if (number < 6) {
                 pw.print(currentThread().getName() + " with ");
-                pw.print("QUESTION" + number + "\r\n");
+                pw.print("QUESTION" + number + "\n");
                 //You can use here to print the sending message.
 //                System.out.println(currentThread().getName() +"  "+ number);
                 switch (number) {
@@ -47,9 +47,9 @@ class ORMClient extends Thread {
                         String publisher = "publisher";
                         //String publisher = "pub'); DROP TABLE books;--";
 
-                        pw.print("insertBook" + "\r\n");
-                        pw.print("title=" + title + "\r\n");
-                        pw.print("publisher=" + publisher + "\r\n");
+                        pw.print("insertBook" + "\n");
+                        pw.print("title=" + title + "\n");
+                        pw.print("publisher=" + publisher + "\n");
                         break;
 
                     case 2:
