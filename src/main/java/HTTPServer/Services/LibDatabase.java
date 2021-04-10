@@ -21,7 +21,7 @@ public class LibDatabase {
 
             //Task III
             System.out.println("Task 3");
-            test.removeBorrowByIds("1", "1", "1");
+            test.removeBorrowByIds("1", "2", "2");
 
             //print all books.
             System.out.println("\nPrint Books in table");
@@ -66,7 +66,7 @@ public class LibDatabase {
             while (res.next()){
                 System.out.println();
                 System.out.println("Branch: " + res.getString("branch"));
-                System.out.println("Name: " + res.getString("name"));
+                System.out.println("Borrower name: " + res.getString("borrower_name"));
             }
 
             // task VI
@@ -457,7 +457,7 @@ public class LibDatabase {
      */
     public synchronized void removeBorrowByIds(String borrowerId, String bookId, String branchId) throws SQLException {
 
-        if (findBorrowByIds(borrowerId, bookId, branchId) == null){
+        if (!(findBorrowByIds(borrowerId, bookId, branchId) == null)){
             PreparedStatement prep = con.prepareStatement("DELETE FROM book_loans " +
                     "WHERE borrowers_id = ? " +
                     "AND book_id = ? " +
@@ -549,7 +549,7 @@ public class LibDatabase {
 
 
     public synchronized ResultSet findBorrowedBooksByDueDateFromBranchName(String branch, String dueDate) throws SQLException {
-        PreparedStatement sqlQuery = con.prepareStatement("SELECT lb.name AS branch, u.name AS name FROM book_loans bl " +
+        PreparedStatement sqlQuery = con.prepareStatement("SELECT lb.name AS branch, u.name AS borrower_name, b.title AS book_title FROM book_loans bl " +
                 "JOIN (SELECT * FROM user u) AS u ON u.id = bl.borrowers_id " +
                 "JOIN (SELECT * FROM books b) AS b ON b.book_id = bl.book_id " +
                 "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +

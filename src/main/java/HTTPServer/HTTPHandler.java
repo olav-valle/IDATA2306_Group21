@@ -446,9 +446,18 @@ public class HTTPHandler implements Runnable {
                 case ("findBorrowedBooksByDueDateFromBranchName"):
                     // Question 5
                     try {
-                        db.findBorrowedBooksByDueDateFromBranchName(
+                        ResultSet res = db.findBorrowedBooksByDueDateFromBranchName(
                                 reqBodyLines[2].split("=")[1],
                                 reqBodyLines[3].split("=")[1]);
+                        response.appendBodyString("Books due today in each branch:\n----\n");
+                        while (res.next()) {
+                            response.appendBodyString(
+                                    "Branch: " + res.getString("branch") + "\n");
+                            response.appendBodyString("Book title: " + res.getString("book_title") + "\n");
+                            response.appendBodyString(
+                                    "Borrower name: " + res.getString("borrower_name")  + "\n\n");
+
+                        }
 
                         // set response status
                         status = HttpStatusCode.getByValue(200);
@@ -463,7 +472,16 @@ public class HTTPHandler implements Runnable {
                 case ("getNumberOfBorrowsPerBranch"):
                     // Question 6
                     try {
-                        db.getNumberOfBorrowsPerBranch();
+                        ResultSet res = db.getNumberOfBorrowsPerBranch();
+                        response.appendBodyString("Number of books being borrowed in each branch:\n----\n");
+                        while (res.next()) {
+                            response.appendBodyString(
+                                    "Branch: "
+                                            + res.getString("name")
+                                            + " - "
+                                            + res.getString("books_amount")
+                                            + " book(s) being borrowed." + "\n");
+                        }
                         // set response status
                         status = HttpStatusCode.getByValue(200);
                         response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());

@@ -35,13 +35,13 @@ class ORMClient extends Thread {
             pw.print("Host: localhost\r\n\r\n");
             //request body formation.
 
-            if (number < 6) {
+            if (number <= 6) {
                 pw.print(currentThread().getName() + " with ");
                 pw.print("QUESTION" + number + "\n");
                 //You can use here to print the sending message.
 //                System.out.println(currentThread().getName() +"  "+ number);
-                switch (number) {
-                    case 1:
+                switch (currentThread().getName()) {
+                    case "Client 1":
 
                         String title = "title";
                         String publisher = "publisher";
@@ -52,7 +52,7 @@ class ORMClient extends Thread {
                         pw.print("publisher=" + publisher + "\n");
                         break;
 
-                    case 2:
+                    case "Client 2":
                         String id = "10";
                         String newName = "superUser";
                         String newPassword = "s3cr3t";
@@ -62,25 +62,25 @@ class ORMClient extends Thread {
                         pw.print("newName=" + newName + "\n");
                         pw.print("newPassword=" + newPassword + "\n");
                         break;
-                    case 3:
+                    case "Client 3":
                         pw.print("removeBorrowByIds\n");
 
-                        String borrowersId = "1";
-                        String bookId = "1";
+                        String borrowersId = "2";
+                        String bookId = "2";
                         String branchId = "1";
 
                         pw.print("borrowersId=" + borrowersId + "\n");
                         pw.print("bookId=" + bookId + "\n");
                         pw.print("branchId=" + branchId + "\n");
                         break;
-                    case 4:
+                    case "Client 4":
                         pw.print("findBorrowedBooksByTitle\n");
 
-                        title = "test"; // title was defined in this scope.
+                        title = "book1"; // title was defined in this scope.
                         pw.print("title="+ title + "\n");
 
                         break;
-                    case 5:
+                    case "Client 5":
                         pw.print("findBorrowedBooksByDueDateFromBranchName\n");
 
                         String branch = "Branch A";
@@ -89,7 +89,7 @@ class ORMClient extends Thread {
                         pw.print("branch=" + branch + "\n");
                         pw.print("dueDate=" + dueDate + "\n");
                         break;
-                    case 6:
+                    case "Client 6":
                         pw.print("getNumberOfBorrowsPerBranch");
                         break;
                     default:
@@ -100,6 +100,7 @@ class ORMClient extends Thread {
             pw.flush();
 
             while ((response = br.readLine()) != null) System.out.println(currentThread().getName() + " " + response);
+            System.out.println("");
 
 
         }catch(Exception e){
@@ -131,12 +132,13 @@ public class ORMTestClient {
         ORMClient ormClient5 = new ORMClient();
         ORMClient ormClient6 = new ORMClient();
 
-        ormClient1.setName("Client 1 - ");
-        ormClient2.setName("Client 2 - ");
-        ormClient3.setName("Client 3 - ");
-        ormClient4.setName("Client 4 - ");
-        ormClient5.setName("Client 5 - ");
-        ormClient5.setName("Client 6 - ");
+        ormClient1.setName("Client 1");
+        ormClient2.setName("Client 2");
+        ormClient3.setName("Client 3");
+        ormClient4.setName("Client 4");
+        ormClient5.setName("Client 5");
+        ormClient6.setName("Client 6");
+
 
         ormClient1.start();
         ormClient2.start();
