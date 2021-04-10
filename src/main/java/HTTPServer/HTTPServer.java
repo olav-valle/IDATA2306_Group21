@@ -28,7 +28,7 @@ public class HTTPServer{
     static final String METHOD_NOT_SUPPORTED = "501.html";
 
     // Port Setting
-    static final int PORT = 8080;
+    static final int PORT = 8082;
 
     // DEBUGGING
     // ----------------------------------------------
