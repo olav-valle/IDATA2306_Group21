@@ -154,6 +154,7 @@ public class LibDatabase {
         con.createStatement().execute("DROP TABLE IF EXISTS library_branches;");
         con.createStatement().execute("DROP TABLE IF EXISTS book_loans;");
         con.createStatement().execute("DROP TABLE IF EXISTS branch_inventory;");
+        getDatabase().createAllTables();
     }
 
 
@@ -161,13 +162,17 @@ public class LibDatabase {
         getConnection();
 
         try {
-            createBooksTable();
-            createBorrowTable();
-            createLibraryBranchesTable();
-            createUserTable();
+            createAllTables();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createAllTables() throws SQLException {
+        createBooksTable();
+        createBorrowTable();
+        createLibraryBranchesTable();
+        createUserTable();
     }
 
     /**
@@ -548,9 +553,10 @@ public class LibDatabase {
                 "JOIN (SELECT * FROM user u) AS u ON u.id = bl.borrowers_id " +
                 "JOIN (SELECT * FROM books b) AS b ON b.book_id = bl.book_id " +
                 "JOIN (SELECT * FROM library_branches lb) AS lb  ON lb.branch_id = bl.branch_id " +
-                "WHERE lb.name = ? ");
+                "WHERE lb.name = ? " +
+                "AND bl.due_date = ?");
         sqlQuery.setString(1, branch);
-        //sqlQuery.setString(2, dueDate);
+        sqlQuery.setString(2, dueDate);
         ResultSet res = sqlQuery.executeQuery();
 
         return res;
