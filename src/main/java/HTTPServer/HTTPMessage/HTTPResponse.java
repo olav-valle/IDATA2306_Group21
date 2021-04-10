@@ -19,6 +19,7 @@ public class HTTPResponse {
 
     /**
      * Returns string representing the HTTP-version used by this response message.
+     *
      * @return HTTP-version used by this response.
      */
     public String getVersion() {
@@ -27,6 +28,7 @@ public class HTTPResponse {
 
     /**
      * Returns string representing the Status-Code for this response message.
+     *
      * @return Status-Code for this response.
      */
     public String getStatusCode() {
@@ -35,6 +37,7 @@ public class HTTPResponse {
 
     /**
      * Returns string representing the Reason-Phrase used by this response message.
+     *
      * @return Reason-Phrase for this response.
      */
     public String getReasonPhrase() {
@@ -45,6 +48,7 @@ public class HTTPResponse {
      * Returns a map holding the header fields for this response message.
      * Elements are stored in the order they were added to the original map.
      * The uses header-name as keys, and header-value as value.
+     *
      * @return map of message header fields.
      */
     public LinkedHashMap<String, String> getHeadFields() {
@@ -55,6 +59,7 @@ public class HTTPResponse {
 
     /**
      * Returns string representing the message body of this response message.
+     *
      * @return Message body.
      */
     public String getBody() {
@@ -76,8 +81,8 @@ public class HTTPResponse {
 
         // Mandatory fields
         private final String version;
-        private final String statusCode;
-        private final String reasonPhrase;
+        private String statusCode;
+        private String reasonPhrase;
         // Optional fields
         private final LinkedHashMap<String, String> headFields = new LinkedHashMap<>();
 
@@ -90,18 +95,27 @@ public class HTTPResponse {
          * according to RFC 2616:
          * HTTP-Version SP Status-Code SP Reason-Phrase CRLF
          *
-         *
-         * @param version      HTTP-Version of response.
-         * @param statusCode   Response status code, according to RFC 2616
-         * @param reasonPhrase Response Reason-Phrase according to RFC 2616
+         * @param version HTTP-Version of response.
          */
-        public Builder(String version, String statusCode, String reasonPhrase) {
+        public Builder(String version) {
             //TODO: 02/03/2021 make this safer.
             // Throw som param excepts and stuff.
 
             this.version = version;
+        }
+
+        /**
+         * Set the response status code and reason phrase.
+         *
+         * @param statusCode   Response status code, according to RFC 2616
+         * @param reasonPhrase Response Reason-Phrase according to RFC 2616
+         * @return this builder object.
+         */
+        public Builder setStatusCodeAndPhrase(String statusCode, String reasonPhrase) {
             this.statusCode = statusCode;
             this.reasonPhrase = reasonPhrase;
+
+            return this;
         }
 
         /**
@@ -132,9 +146,10 @@ public class HTTPResponse {
 
         /**
          * Get the current size of the response message body.
+         *
          * @return current size of the response message body.
          */
-        public int getBodyLength(){
+        public int getBodyLength() {
             return body.length();
         }
 

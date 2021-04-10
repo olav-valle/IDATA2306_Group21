@@ -294,8 +294,8 @@ public class HTTPHandler implements Runnable {
      */
     private static HTTPResponse.Builder handleNYIRequest(HTTPRequest request) {
         logger.info("Building response");
-        HTTPResponse.Builder resBuilder = new HTTPResponse.Builder(request.getVersion(), "501", "Not Implemented");
-
+        HTTPResponse.Builder resBuilder = new HTTPResponse.Builder(request.getVersion());
+        resBuilder.setStatusCodeAndPhrase( "501", "Not Implemented");
         File file = new File(WEB_ROOT, METHOD_NOT_SUPPORTED);
         formatGeneralHeaders(resBuilder);
         formatContentHeaders(resBuilder, file);
@@ -347,24 +347,6 @@ public class HTTPHandler implements Runnable {
                 System.out.println(request.toString());
                 POSTLibraryAPI(response, request);
                 break;
-            case ("/uservalidation/"):
-                POSTUserValidation(response, request);
-                break;
-            case ("/pokerdistribution/"):
-                POSTPoker(response, request);
-                break;
-            case ("/usertextupload/"):
-                // Shouldn't this be a PUT request, not POST..?
-                String filePath = null;
-                try {
-                    filePath = POSTUserTextUpload(request);
-                    response.appendBodyString("File upload succeeded. The path is /" + filePath + "\r\n");
-                } catch (IOException e) {
-                    response.appendBodyString("File upload failed.");
-                    logger.info(e.getMessage());
-                }
-                //String filePath = "did/you/really/think/I/would/enable/indiscriminate/uploading/to/my/server.txt";
-                break;
             default:
         }
         // Update response message with correct content-length header
@@ -375,8 +357,10 @@ public class HTTPHandler implements Runnable {
 
     private static void POSTLibraryAPI(HTTPResponse.Builder response, HTTPRequest request) {
 
+        // TODO: 10/04/2021 change status code of response to reflect query result
         LibDatabase db = LibDatabase.getDatabase();
         String[] reqBodyLines = request.getBody().split("\n");
+        HttpStatusCode status;
         boolean success = false;
         if (reqBodyLines.length > 1) {
             switch (reqBodyLines[1]) {
@@ -387,9 +371,16 @@ public class HTTPHandler implements Runnable {
                             reqBodyLines[3].split("=")[1]
                     );
                     if (success) {
+                        // set response status
+                        status = HttpStatusCode.getByValue(201);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription() );
+                        // append message for user to body
                         response.appendBodyString("Book insertion successful.");
-                        System.out.println("Added book");
+//                        System.out.println("Added book");
                     } else {
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription() );
                         response.appendBodyString("Warning: Book insertion failed.");
                     }
                     break;
@@ -399,9 +390,16 @@ public class HTTPHandler implements Runnable {
                             reqBodyLines[3].split("=")[1],
                             reqBodyLines[4].split("=")[1]);
                     if (success) {
+                        // set response status
+                        status = HttpStatusCode.getByValue(200);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
+
                         response.appendBodyString("User details updated..");
 
                     } else {
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                         response.appendBodyString("Warning: Failed to update user details");
                     }
                     break;
@@ -412,8 +410,14 @@ public class HTTPHandler implements Runnable {
                                 reqBodyLines[3].split("=")[1],
                                 reqBodyLines[4].split("=")[1]);
                         response.appendBodyString("Book loan instance successfully deleted.");
+                        // set response status
+                        status = HttpStatusCode.getByValue(200);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                         response.appendBodyString("Warning: Failed to delete book loan instance.");
                     }
                     break;
@@ -429,7 +433,13 @@ public class HTTPHandler implements Runnable {
                             response.appendBodyString("\n");
 
                         }
+                        // set response status
+                        status = HttpStatusCode.getByValue(200);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                     } catch (SQLException throwables) {
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                         throwables.printStackTrace();
                     }
                     break;
@@ -439,7 +449,14 @@ public class HTTPHandler implements Runnable {
                         db.findBorrowedBooksByDueDateFromBranchName(
                                 reqBodyLines[2].split("=")[1],
                                 reqBodyLines[3].split("=")[1]);
+
+                        // set response status
+                        status = HttpStatusCode.getByValue(200);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                     } catch (SQLException throwables) {
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                         throwables.printStackTrace();
                     }
                     break;
@@ -447,7 +464,13 @@ public class HTTPHandler implements Runnable {
                     // Question 6
                     try {
                         db.getNumberOfBorrowsPerBranch();
+                        // set response status
+                        status = HttpStatusCode.getByValue(200);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                     } catch (SQLException throwables) {
+                        // set response status
+                        status = HttpStatusCode.getByValue(400);
+                        response.setStatusCodeAndPhrase(String.valueOf(status.getValue()), status.getDescription());
                         throwables.printStackTrace();
                     }
                     break;
@@ -458,59 +481,6 @@ public class HTTPHandler implements Runnable {
 
 
     }
-
-    /**
-     * Reads POST request message body content into a file.
-     *
-     * @param request POST request message to read into file.
-     * @return the path and name of the created file.
-     */
-    private static String POSTUserTextUpload(HTTPRequest request) throws IOException {
-        String fileName = "/message-" + new Date() + ".txt";
-        String filePath = WEB_ROOT + fileName;
-        String returnValue = "";
-        try {
-            File messageFile = new File(filePath);
-            if (messageFile.createNewFile()) {
-                FileWriter fw = new FileWriter(filePath);
-                fw.write(request.getBody());
-                fw.close();
-                returnValue = ROOT_NAME + fileName;
-            } else {
-                logger.info("File " + fileName + " somehow already existst... \n" +
-                        "Cannot write.");
-            }
-        } catch (IOException e) {
-            throw e;
-        }
-        return returnValue;
-    }
-
-    private static void POSTUserValidation(HTTPResponse.Builder response, HTTPRequest request) {
-        response.appendBodyString("Validation results are: \r\n\r\n");
-        // Get validation for all usernames in request body.
-        ValidUserName
-                .validateSeveralNames(request
-                        .getBody()
-                        .lines()
-                        .skip(1) // The first line of request body is the number of usernames, and we don't care.
-                        .collect(Collectors // method validateSeveralNames needs ArrayList parameter
-                                .toCollection(ArrayList::new)))
-                // Append results to response body
-                .forEach(s -> response.appendBodyString(s + "\r\n"));
-    }
-
-    private static void POSTPoker(HTTPResponse.Builder response, HTTPRequest request) {
-        //PokerSend poker = new PokerSend();
-        PokerSend poker = new PokerSend();
-        String username = request.getBody().split(" ")[2];
-        String hand = poker.getPlayerhand(username);
-        logger.info("username is: " + username);
-        logger.info("Hand is: " + hand);
-        response.appendBodyString("Cards are: \r\n\r\n");
-        response.appendBodyString(hand);
-    }
-
 
     /**
      * Creates an HTTPResponse builder object,
@@ -577,8 +547,13 @@ public class HTTPHandler implements Runnable {
             String reasonPhrase = "";
             HttpStatusCode status;
 
+            builder = new HTTPResponse
+                    .Builder(request.getVersion()); // HTTP-version same as request
+
             // Status-Line
-            if (Files.exists(Path.of(request.getUrl())) || request.getMethod().equals("POST")) {
+            if (Files.exists(Path.of(request.getUrl()))
+                    || request.getMethod().equals("POST")
+            ) {
                 // 200 OK
                 status = HttpStatusCode.getByValue(200);
             } else {
@@ -588,11 +563,8 @@ public class HTTPHandler implements Runnable {
 
             statusCode = String.valueOf(status.getValue());
             reasonPhrase = status.getDescription();
-
-            builder = new HTTPResponse
-                    .Builder(request.getVersion(), // HTTP-version same as request
-                    statusCode,
-                    reasonPhrase);
+            builder.setStatusCodeAndPhrase(statusCode, reasonPhrase);
+            // TODO: 10/04/2021 Remember to update code if API request fails...
         }
         return builder;
     }
