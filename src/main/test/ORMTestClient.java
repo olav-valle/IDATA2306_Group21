@@ -63,29 +63,34 @@ class ORMClient extends Thread {
                         pw.print("newPassword=" + newPassword + "\n");
                         break;
                     case 3:
-                        pw.print("updateUser\n");
+                        pw.print("removeBorrowByIds\n");
 
-                        String borrowers_id = "1";
-                        String book_id = "1";
-                        String branch_id = "1";
+                        String borrowersId = "1";
+                        String bookId = "1";
+                        String branchId = "1";
 
-                        pw.print("borrowersId=" + borrowers_id + "\n");
-                        pw.print("bookId=" + book_id + "\n");
-                        pw.print("branchId=" + branch_id + "\n");
+                        pw.print("borrowersId=" + borrowersId + "\n");
+                        pw.print("bookId=" + bookId + "\n");
+                        pw.print("branchId=" + branchId + "\n");
                         break;
                     case 4:
                         pw.print("findBorrowedBooksByTitle\n");
 
-                        String User_Id;
-
-                                pw.print("User_Id="+ "\n");
+                        title = "test"; // title was defined in this scope.
+                        pw.print("title="+ title + "\n");
 
                         break;
                     case 5:
-                        //todo: implement
+                        pw.print("findBorrowedBooksByDueDateFromBranchName\n");
+
+                        String branch = "Branch A";
+                        String dueDate = "01.01.2000";
+
+                        pw.print("branch=" + branch + "\n");
+                        pw.print("dueDate=" + dueDate + "\n");
                         break;
                     case 6:
-                        //todo: implement
+                        pw.print("getNumberOfBorrowsPerBranch");
                         break;
                     default:
                         System.out.println("Not a valid: " + number);
@@ -124,18 +129,21 @@ public class ORMTestClient {
         ORMClient ormClient3 = new ORMClient();
         ORMClient ormClient4 = new ORMClient();
         ORMClient ormClient5 = new ORMClient();
+        ORMClient ormClient6 = new ORMClient();
 
         ormClient1.setName("Client 1 - ");
         ormClient2.setName("Client 2 - ");
         ormClient3.setName("Client 3 - ");
         ormClient4.setName("Client 4 - ");
         ormClient5.setName("Client 5 - ");
+        ormClient5.setName("Client 6 - ");
 
         ormClient1.start();
         ormClient2.start();
         ormClient3.start();
         ormClient4.start();
         ormClient5.start();
+        ormClient6.start();
 
     }
 }

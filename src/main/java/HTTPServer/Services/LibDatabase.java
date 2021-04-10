@@ -87,10 +87,9 @@ public class LibDatabase {
 
             res = test.findBorrowedBooksByTitle("book1");
             while (res.next()){
-                System.out.println("Book title: " + res.getString("book_name"));
+                System.out.println("Book title: " + res.getString("book_title"));
                 System.out.println("Name of borrower: " + res.getString("user_name"));
                 System.out.println("Branch Name: " + res.getString("branch_name"));
-                //todo: get branch name? Collides with borrower name in res object..?
             }
 
             System.out.println(); // make some space
@@ -441,7 +440,7 @@ public class LibDatabase {
      */
     public synchronized ResultSet findBorrowedBooksByTitle(String title) throws SQLException {
         PreparedStatement sqlQuery = con.prepareStatement("SELECT " +
-                "b.title AS book_name, " +
+                "b.title AS book_title, " +
                 "lb.name AS branch_name, " +
                 "u.name AS user_name " +
                 "FROM book_loans bl " +
